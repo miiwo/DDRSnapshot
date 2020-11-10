@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DDRTracker.Views.SongDetailPage"
+             Title="{Binding Title}">
+
+    <StackLayout Spacing="20" Padding="15">
+
+        <Label Text="Song Name:" FontSize="Medium" TextColor="Black" />
+        <Label Text="{Binding Name}" FontSize="Small" TextColor="Black" />
+
+        <Label Text="Score:" FontSize="Medium" TextColor="Black" />
+        <Entry Text="{Binding Score, Mode=TwoWay}" Placeholder="0" Keyboard="Numeric" TextColor="Black" />
+
+
+        <StackLayout Orientation="Horizontal">
+            <Button Text="Cancel" Command="{Binding CancelCommand}" HorizontalOptions="FillAndExpand"></Button>
+            <Button Text="Save" Command="{Binding SaveCommand}" HorizontalOptions="FillAndExpand"></Button>
+        </StackLayout>
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}" />
+
+    </StackLayout>
+</ContentPage>
