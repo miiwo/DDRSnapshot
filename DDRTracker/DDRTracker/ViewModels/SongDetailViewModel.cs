@@ -1,7 +1,10 @@
 ﻿using DDRTracker.Helpers;
 using DDRTracker.Models;
+using DDRTracker.Services;
+
 using System;
 using System.Diagnostics;
+
 using Xamarin.Forms;
 
 namespace DDRTracker.ViewModels
@@ -11,7 +14,7 @@ namespace DDRTracker.ViewModels
     /// Note: Consider turning Commands into ICommands and turning them into their respective equivalents here. Mouse over the changeCanExecute to get what the event should really be called.
     /// </summary>
     [QueryProperty(nameof(SongId), nameof(SongId))] // Identifier/Route of this class. First Argument is the public property name from this class. Second argument is the parameter name used in the URL by the navigation.
-    class SongDetailViewModel : DataStoreViewModelBase<Song, string>
+    class SongDetailViewModel : ObservableBase
     {
         #region SongID
         // This is the parameters as given by navigation. Parameters are given in string format and must be converted if data type is different.
@@ -49,6 +52,17 @@ namespace DDRTracker.ViewModels
         public Command CancelCommand { get; }
         #endregion
 
+        IDataSource<Song, string> DataStore => DependencyService.Get<IDataSource<Song, string>>();
+
+        #region IsBusy
+        bool _isBusy = false;
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set { SetField(ref _isBusy, value); }
+        }
+        #endregion
+
         public SongDetailViewModel()
         {
             SaveCommand = new Command(OnUpdate);
@@ -79,20 +93,19 @@ namespace DDRTracker.ViewModels
                     Score = Score
                 };
 
-                await DataStore.UpdateAsync(updatedSong);
-
+                await DataStore.UpdateAsync(updatedSong); // Remove await from this, don't need to await if you think about it.
+                await Shell.Current.GoToAsync("..");
             } 
             catch (Exception)
             {
                 Debug.WriteLine("Could not convert string into a corresponding integer.");
-                return;
+                await Shell.Current.DisplayAlert("UPDATE", "Something happened while trying to update this song.", "OK");
             }
             finally
             {
                 IsBusy = false;
             }
             
-            await Shell.Current.GoToAsync("..");
         }
 
         /// <summary>
@@ -114,7 +127,7 @@ namespace DDRTracker.ViewModels
             catch(Exception)
             {
                 Debug.WriteLine("Failed to Load Song");
-                await Application.Current.MainPage.DisplayAlert("No Song", ":( Could not load song with given ID", "OK");
+                await Shell.Current.DisplayAlert("No Song", ":( Could not load song with given ID", "OK");
                 await Shell.Current.GoToAsync("..");
             }
             finally

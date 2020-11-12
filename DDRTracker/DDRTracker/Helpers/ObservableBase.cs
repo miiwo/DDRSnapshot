@@ -8,7 +8,7 @@ namespace DDRTracker.Helpers
     /// <summary>
     /// Abstract class that contains the necessary functions for an Observable Object.
     /// </summary>
-    abstract class ObservableBase : INotifyPropertyChanged, INotifyPropertyChanging
+    public abstract class ObservableBase : INotifyPropertyChanged, INotifyPropertyChanging
     {
         #region Constructors
 

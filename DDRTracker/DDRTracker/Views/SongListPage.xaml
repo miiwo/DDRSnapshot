@@ -7,8 +7,8 @@
              xmlns:model="clr-namespace:DDRTracker.Models"
              x:Name="BrowseSongPage">
 
-    <RefreshView x:DataType="local:SongListViewModel" Command="{Binding LoadSongsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
-        <CollectionView  x:Name="SongsListView" ItemsSource="{Binding Songs}" SelectionMode="None">
+    <RefreshView x:DataType="local:SongListViewModel" Command="{Binding LoadListCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+        <CollectionView  x:Name="SongsListView" ItemsSource="{Binding ItemList}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <StackLayout Padding="10" x:DataType="model:Song">
@@ -16,7 +16,7 @@
                         <Label Text="{Binding Score}" TextColor="Black" FontSize="13" />
                         <StackLayout.GestureRecognizers>
                             <TapGestureRecognizer NumberOfTapsRequired="1" 
-                                                  Command="{Binding Source={RelativeSource AncestorType={x:Type local:SongListViewModel}}, Path=SongTapped}" 
+                                                  Command="{Binding Source={RelativeSource AncestorType={x:Type local:SongListViewModel}}, Path=ItemTapped}" 
                                                   CommandParameter="{Binding .}" />
                         </StackLayout.GestureRecognizers>
                     </StackLayout>

@@ -10,13 +10,13 @@ namespace DDRTracker.Services
 {
     /// <summary>
     /// Concrete class that implements a data store using MongoDB as a cloud database. Currently stores it in mobile device using a Realm database.
+    /// Note: Have this class throw exceptions.
     /// </summary>
-    class MongoRealmDataStore : IDataSource<Song, string>
+    class RealmDataStore : IDataSource<Song, string>
     {
-        Realm realm = null;
+        readonly Realm realm = null;
 
-
-        public MongoRealmDataStore()
+        public RealmDataStore()
         {
             // Setup offline database
             var config = new RealmConfiguration("ddr-track-starter.realm");

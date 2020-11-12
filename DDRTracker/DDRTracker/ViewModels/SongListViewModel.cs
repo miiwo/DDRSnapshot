@@ -1,77 +1,46 @@
-﻿using DDRTracker.Helpers;
-using DDRTracker.Models;
+﻿using DDRTracker.Models;
+using DDRTracker.Services;
 using DDRTracker.Views;
+
 using System;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
+
 using Xamarin.Forms;
 
 namespace DDRTracker.ViewModels
 {
     /// <summary>
-    /// ViewModel to display a list of songs from the datastore.
-    /// Note: Turn this into a Singleton as there should only be one instance of this class ever at runtime.
+    /// ViewModel to display a list of songs from the datastore. Singleton as there should only be one instance of this class ever at runtime. Master list for a user.
+    /// Note: Check my overrides access modifiers.
     /// </summary>
-    class SongListViewModel : DataStoreViewModelBase<Song, string>
+    public sealed class SongListViewModel : ListViewModelBase<Song, string>
     {
-        #region SelectedSong
-        Song _selectedSong;
-        public Song SelectedSong
-        {
-            get { return _selectedSong; }
-            set 
-            {
-                SetField(ref _selectedSong, value, null, OnSongSelected);
-            }
-        }
-        #endregion
+        public static SongListViewModel Instance { get; } = new SongListViewModel();
 
-        public ObservableCollection<Song> Songs { get; }
+        IDataSource<Song, string> DataStore => DependencyService.Get<IDataSource<Song, string>>();
 
-        #region Commands
-        public Command LoadSongsCommand { get; }
-        public Command<Song> SongTapped { get; }
-        #endregion
+        private SongListViewModel() {}
 
-        public SongListViewModel()
-        {
-            Title = "Song List";
-            Songs = new ObservableCollection<Song>();
-            LoadSongsCommand = new Command(async () => await ExecuteLoadSongsCommand());
-            SongTapped = new Command<Song>(OnSongSelected);
-        }
-
-        /// <summary>
-        /// When the page first appears, intialize some fields.
-        /// </summary>
-        public void OnAppearing()
-        {
-            IsBusy = true;
-            SelectedSong = null;
-        }
-
-        /// <summary>
-        /// Loads the songs into a viewable list.
-        /// </summary>
-        /// <returns></returns>
-        async Task ExecuteLoadSongsCommand()
+        public override async Task ExecuteLoadItemsCommand()
         {
             IsBusy = true;
 
             try
             {
-                Songs.Clear();
+                ItemList.Clear();
+
                 var songs = await DataStore.GetAllAsync(true);
                 foreach (var song in songs)
                 {
-                    Songs.Add(song);
+                    ItemList.Add(song);
                 }
             }
             catch (Exception e)
             {
                 Debug.WriteLine("Could not load songs from data store.");
                 Debug.WriteLine(e);
+                await Shell.Current.DisplayAlert("SONG LIST", "Could not load songs from database.", "OK");
             }
             finally
             {
@@ -79,18 +48,15 @@ namespace DDRTracker.ViewModels
             }
         }
 
-        /// <summary>
-        /// If a song is selected, move user into a detail page with more info about said song.
-        /// </summary>
-        /// <param name="song">Selected Song</param>
-        async void OnSongSelected(Song song)
+        public override async void OnItemSelected(Song item)
         {
-            if (song == null) 
+            if (item == null) 
             {
                 return;
             }
 
-            await Shell.Current.GoToAsync($"{nameof(SongDetailPage)}?{nameof(SongDetailViewModel.SongId)}={song.Id}");
+            await Shell.Current.GoToAsync($"{nameof(SongDetailPage)}?{nameof(SongDetailViewModel.SongId)}={item.Id}");
         }
+
     }
 }
