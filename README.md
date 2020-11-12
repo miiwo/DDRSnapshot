@@ -11,4 +11,5 @@
 
 # For Later
 - Add more proper fields to model
+- Make this app look prettier
 - Train my own number recognition system
