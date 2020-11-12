@@ -8,13 +8,13 @@
         <Label Text="Grab a picture from your gallery!" FontSize="Medium" TextColor="Black" />
 
         <StackLayout Orientation="Horizontal">
-            <Button Text="Pick Picture" Command="{Binding GalleryCommand}" HorizontalOptions="FillAndExpand"></Button>
-            <Button Text="Take Picture" Command="{Binding TakePictureCommand}" HorizontalOptions="FillAndExpand"></Button>
+            <Button Text="Pick Picture" Command="{Binding GalleryCommand}" HorizontalOptions="FillAndExpand" />
+            <Button Text="Take Picture" Command="{Binding TakePictureCommand}" HorizontalOptions="FillAndExpand" />
         </StackLayout>
 
-        <Image Source="{Binding ResultImage}"></Image>
+        <Image Source="{Binding ResultImage}" Aspect="AspectFit"></Image>
 
-        <Button Text="Process Picture" Command="{Binding ProcessCommand}" HorizontalOptions="FillAndExpand"></Button>
+        <Button Text="Process Picture" Command="{Binding ProcessCommand}" HorizontalOptions="FillAndExpand" />
 
     </StackLayout>
 </ContentPage>

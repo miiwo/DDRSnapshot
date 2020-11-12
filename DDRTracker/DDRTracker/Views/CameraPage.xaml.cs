@@ -12,7 +12,7 @@ namespace DDRTracker.Views
         public CameraPage()
         {
             InitializeComponent();
-            BindingContext = new CameraViewModel();
+            BindingContext = SongCameraViewModel.Instance;
         }
 
 
