@@ -1,6 +1,6 @@
 # TODO List
 
-- [ ] Hook up to Online Database
+- [x] Hook up to Online Database
 - [x] Implement Offline Database
 - [x] Implement Camera page (Pick/Take pictures)
 - [x] Process picture to model
