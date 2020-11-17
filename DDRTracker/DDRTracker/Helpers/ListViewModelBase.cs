@@ -19,7 +19,7 @@ namespace DDRTracker.ViewModels
         public ObservableCollection<Model> ItemList { get; }
 
         #region Commands
-        public Command LoadListCommand { get; }
+        public ICommand LoadListCommand { get; }
         public Command<Model> ItemTapped { get; }
         #endregion
         #region SelectedItem

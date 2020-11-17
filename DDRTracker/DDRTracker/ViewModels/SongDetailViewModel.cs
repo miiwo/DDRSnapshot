@@ -48,8 +48,8 @@ namespace DDRTracker.ViewModels
         #endregion
 
         #region Commands
-        public Command SaveCommand { get; }
-        public Command CancelCommand { get; }
+        public ICommand SaveCommand { get; }
+        public ICommand CancelCommand { get; }
         #endregion
 
         IDataSource<Song, string> DataStore => DependencyService.Get<IDataSource<Song, string>>();

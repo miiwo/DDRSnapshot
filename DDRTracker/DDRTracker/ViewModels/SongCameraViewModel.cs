@@ -24,9 +24,9 @@ namespace DDRTracker.ViewModels
 
         readonly IPhotoProcessor photoAnalyzer;
 
-        public Command ProcessCommand { get; }
+        public ICommand ProcessCommand { get; }
 
-        readonly (string Key, Regex Rgx, bool AlreadyFound)[] tupleList;
+        readonly (string Key, Regex Rgx, bool AlreadyFound)[] detectFromPhotos;
 
         IDataSource<Song, string> DataStore => DependencyService.Get<IDataSource<Song, string>>();
 
@@ -45,7 +45,7 @@ namespace DDRTracker.ViewModels
 
             photoAnalyzer = new AmazonPhotoProcesssor();
 
-            tupleList = new (string Key, Regex Rgx, bool AlreadyFound)[]
+            detectFromPhotos = new (string Key, Regex Rgx, bool AlreadyFound)[]
             {
                 ("NAME", new Regex(@"^[\d\.]+\b(.+)"), false), // Learn to make better regexes me ;-;
                 ("SCORE", new Regex(@"^MARVELOUS (\d+)"), false)
@@ -64,7 +64,7 @@ namespace DDRTracker.ViewModels
             }
 
             photoAnalyzer.ClearData();
-            var resultMap = await photoAnalyzer.ProcessPictureInfoAsync(rawImage, tupleList);
+            var resultMap = await photoAnalyzer.ProcessPictureInfoAsync(rawImage, detectFromPhotos);
             Song song = ConvertToSong(resultMap);
 
             if (song != null) // Put song into database
