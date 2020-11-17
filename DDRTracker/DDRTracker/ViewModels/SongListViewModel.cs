@@ -58,5 +58,29 @@ namespace DDRTracker.ViewModels
             await Shell.Current.GoToAsync($"{nameof(SongDetailPage)}?{nameof(SongDetailViewModel.SongId)}={item.Id}");
         }
 
+        public override async void PerformSearch(string query) 
+        {
+            IsBusy = true;
+
+            try
+            {
+                ItemList.Clear();
+
+                var songs = await ((SongRealmDataStore)DataStore).GetByName(query);
+                foreach(var song in songs)
+                {
+                    ItemList.Add(song);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Something happened while performing a search");
+                Debug.WriteLine(e.Message);
+            }
+            finally {
+                IsBusy = false;
+            }
+        }
+
     }
 }

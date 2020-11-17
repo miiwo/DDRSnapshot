@@ -7,22 +7,25 @@
              xmlns:model="clr-namespace:DDRTracker.Models"
              x:Name="BrowseSongPage">
 
-    <RefreshView x:DataType="local:SongListViewModel" Command="{Binding LoadListCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
-        <CollectionView  x:Name="SongsListView" ItemsSource="{Binding ItemList}" SelectionMode="None">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <StackLayout Padding="10" x:DataType="model:Song">
-                        <Label Text="{Binding Name}" LineBreakMode="NoWrap" TextColor="Black" FontSize="16" />
-                        <Label Text="{Binding Score}" TextColor="Black" FontSize="13" />
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer NumberOfTapsRequired="1" 
-                                                  Command="{Binding Source={RelativeSource AncestorType={x:Type local:SongListViewModel}}, Path=ItemTapped}" 
-                                                  CommandParameter="{Binding .}" />
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </RefreshView>
+    <StackLayout>
+        <SearchBar x:Name="searchBar" Placeholder="Search songs..." TextColor="Black" SearchCommand="{Binding PerformSearchCommand}" SearchCommandParameter="{Binding Text, Source={x:Reference searchBar}" />
+        <RefreshView x:DataType="local:SongListViewModel" Command="{Binding LoadListCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+            <CollectionView  x:Name="SongsListView" ItemsSource="{Binding ItemList}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout Padding="10" x:DataType="model:Song">
+                            <Label Text="{Binding Name}" LineBreakMode="NoWrap" TextColor="Black" FontSize="16" />
+                            <Label Text="{Binding Score}" TextColor="Black" FontSize="13" />
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer NumberOfTapsRequired="1" 
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type local:SongListViewModel}}, Path=ItemTapped}" 
+                                                    CommandParameter="{Binding .}" />
+                            </StackLayout.GestureRecognizers>
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </StackLayout>
     
 </ContentPage>

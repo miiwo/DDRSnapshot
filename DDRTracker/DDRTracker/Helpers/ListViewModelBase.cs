@@ -21,6 +21,7 @@ namespace DDRTracker.ViewModels
         #region Commands
         public ICommand LoadListCommand { get; }
         public Command<Model> ItemTapped { get; }
+        public Command PerformSearchCommand { get; }
         #endregion
         #region SelectedItem
         protected Model _selectedItem;
@@ -46,6 +47,7 @@ namespace DDRTracker.ViewModels
             ItemList = new ObservableCollection<Model>();
             LoadListCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTapped = new Command<Model>(OnItemSelected);
+            PerformSearchCommand = new Command<string>(PerformSearch);
         }
 
         /// <summary>
@@ -68,5 +70,7 @@ namespace DDRTracker.ViewModels
         /// </summary>
         /// <param name="item">Selected item</param>
         public abstract void OnItemSelected(Model item);
+
+        public abstract void PerformSearch(string query);
     }
 }
