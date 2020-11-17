@@ -1,10 +1,13 @@
-﻿using Realms;
-using DDRTracker.Models;
+﻿using DDRTracker.Models;
+
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Diagnostics;
+
+using Realms;
+using Realms.Sync;
 
 namespace DDRTracker.Services
 {
@@ -15,6 +18,7 @@ namespace DDRTracker.Services
     class RealmDataStore : IDataSource<Song, string>
     {
         readonly Realm realm = null;
+        readonly Realms.Sync.App app = null;
 
         public RealmDataStore()
         {
@@ -23,8 +27,20 @@ namespace DDRTracker.Services
             realm = Realm.GetInstance(config);
 
             // Setup online database
+            app = Realms.Sync.App.Create(Constants.RealmAppID);
+            var user = await app.LogInAsync(Credentials.Anonymous());
+            var configTwo = new SyncConfiguration("PUBLIC", user);
+            using (var realmTwo = await Realm.GetInstanceAsync(configTwo))
+            {
+                // Grab data from online and put into local database.
+            }
+            
+            
 
-            // Intialize songs in data source
+        }
+
+        void IntializeSongs()
+        {
             try
             {
                 realm.Write(() =>
@@ -37,10 +53,8 @@ namespace DDRTracker.Services
 
             } catch (Exception)
             {
-                Debug.WriteLine("Something went wrong with setting up the RealmDatabase.");
+                Debug.WriteLine("Something went wrong with intializing intial data in RealmDatabase.");
             };
-            
-
         }
 
         public async Task<bool> AddAsync(Song item)
