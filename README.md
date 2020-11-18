@@ -4,9 +4,9 @@
 - [x] Implement Offline Database
 - [x] Implement Camera page (Pick/Take pictures)
 - [x] Process picture to model
-- [ ] Setup initial data
+- [x] Setup initial data
 - [x] Implement Search Functionality to SongList
-- [ ] Implement Filter buttons to SongList
+- [ ] Implement Filters to SongListPage
 - [ ] Implement Options/Settings Page
 - [ ] Implement Stats Screen
 
