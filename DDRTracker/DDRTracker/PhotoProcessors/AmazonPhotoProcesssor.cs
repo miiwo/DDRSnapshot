@@ -18,6 +18,7 @@ namespace DDRTracker.Services
     /// Proccesses information from a photo into key-value pairs using Amazon's Rekognition system. Decoupled to be used for any photo analyzation.
     /// Note: Change my regexes to be better and change the match group.
     /// Note: Consider making this a singleton because I only want one instance connecting at a time.
+    /// Note: Rewrite code for the tuple list (specifically the readonly problem)
     /// </summary>
     public class AmazonPhotoProcesssor : IPhotoProcessor
     {

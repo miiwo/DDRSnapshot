@@ -10,16 +10,8 @@ namespace DDRTracker.Helpers
     /// </summary>
     public abstract class ObservableBase : INotifyPropertyChanged, INotifyPropertyChanging
     {
-        #region Constructors
+        protected ObservableBase() {}
 
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        protected ObservableBase()
-        {
-        }
-
-        #endregion
         #region INotifyPropertyChanged
         /// <summary>
         /// Event that is raised after a property is changed.
@@ -30,6 +22,7 @@ namespace DDRTracker.Helpers
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
+        
         #region INotifyPropertyChanging
         /// <summary>
         /// Event that is raised before the property is changed.

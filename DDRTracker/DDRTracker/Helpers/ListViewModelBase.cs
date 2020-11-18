@@ -1,9 +1,8 @@
 ﻿using DDRTracker.Helpers;
 
-using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 using Xamarin.Forms;
 
@@ -20,9 +19,10 @@ namespace DDRTracker.ViewModels
 
         #region Commands
         public ICommand LoadListCommand { get; }
-        public Command<Model> ItemTapped { get; }
-        public Command PerformSearchCommand { get; }
+        public ICommand ItemTapped { get; }
+        public ICommand PerformSearchCommand { get; }
         #endregion
+
         #region SelectedItem
         protected Model _selectedItem;
         public Model SelectedItem
@@ -45,6 +45,7 @@ namespace DDRTracker.ViewModels
         public ListViewModelBase()
         {
             ItemList = new ObservableCollection<Model>();
+
             LoadListCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTapped = new Command<Model>(OnItemSelected);
             PerformSearchCommand = new Command<string>(PerformSearch);

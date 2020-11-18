@@ -29,6 +29,7 @@ namespace DDRTracker.ViewModels
         #endregion
 
         public int Id { get; set; }
+        
         #region Name
         string _name;
         public string Name

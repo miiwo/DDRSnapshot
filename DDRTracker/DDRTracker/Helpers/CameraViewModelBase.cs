@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Input;
 
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -11,6 +12,7 @@ namespace DDRTracker.InterfaceBases
 {
     /// <summary>
     /// This class represents what a page should do when using the Camera. It should be able to take pictures, and pick pictures from the gallery. Also supports an option to display the image selected/taken in the app.
+    /// Note: Check that the rawImage and selectedImage are working properly.
     /// </summary>
     public abstract class CameraViewModelBase : ObservableBase
     {
@@ -25,8 +27,8 @@ namespace DDRTracker.InterfaceBases
         #endregion
 
         #region Commands
-        public Command TakePictureCommand { get; }
-        public Command GalleryCommand { get; }
+        public ICommand TakePictureCommand { get; }
+        public ICommand GalleryCommand { get; }
         #endregion
 
         public CameraViewModelBase()
@@ -42,7 +44,7 @@ namespace DDRTracker.InterfaceBases
         {
             if (!MediaPicker.IsCaptureSupported)
             {
-                await Shell.Current.DisplayAlert("NO CAMERA", "No camera is available :(", "OK");
+                await Shell.Current.DisplayAlert("NO CAMERA", "No camera is available.", "OK");
                 return;
             }
 

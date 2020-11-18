@@ -1,4 +1,5 @@
 ﻿using DDRTracker.Models;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 namespace DDRTracker.Services
 {
     /// <summary>
-    /// Concrete class that implements an in-memory repository for handling songs in the DDR Tracking Application.
+    /// Concrete class that implements an in-memory repository for handling songs in the DDR Tracking Application. Used to test out that the architecture works.
     /// </summary>
     public class LocalSongDataStore : IDataSource<Song, string>
     {

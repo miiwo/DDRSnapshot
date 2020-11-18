@@ -12,9 +12,11 @@
             <Button Text="Take Picture" Command="{Binding TakePictureCommand}" HorizontalOptions="FillAndExpand" />
         </StackLayout>
 
+        <Button Text="Process Picture" Command="{Binding ProcessCommand}" HorizontalOptions="FillAndExpand" />
+
         <Image Source="{Binding ResultImage}" Aspect="AspectFit"></Image>
 
-        <Button Text="Process Picture" Command="{Binding ProcessCommand}" HorizontalOptions="FillAndExpand" />
+        
 
     </StackLayout>
 </ContentPage>

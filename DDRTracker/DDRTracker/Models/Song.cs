@@ -9,7 +9,9 @@ namespace DDRTracker.Models
     {
         [PrimaryKey]
         public int Id { get; set; }
-        public string Name { get; set; } // Name of the Song
+
+        public string Name { get; set; }
+        
         public int Score { get; set; }
     }
 }

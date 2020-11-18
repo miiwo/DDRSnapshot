@@ -1,5 +1,4 @@
-﻿
-using DDRTracker.ViewModels;
+﻿using DDRTracker.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
