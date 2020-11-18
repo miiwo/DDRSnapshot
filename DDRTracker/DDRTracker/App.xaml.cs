@@ -9,7 +9,7 @@ namespace DDRTracker
         {
             InitializeComponent();
 
-            DependencyService.Register<MongoRealmDataStore>();
+            DependencyService.Register<SongRealmDataStore>();
             MainPage = new AppShell();
         }
 

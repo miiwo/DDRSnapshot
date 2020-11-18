@@ -33,6 +33,16 @@ namespace DDRTracker.Services
             using (var realmTwo = await Realm.GetInstanceAsync(configTwo))
             {
                 // Grab data from online and put into local database.
+                var onlineSongs = realmTwo.All<RealmDataModel>();
+                foreach(RealmDataModel rdm in onlineSongs)
+                {
+                    tmpRealm.Add((tmpRealm) => tmpRealm.Add(new Song() 
+                    {
+                        Name = rdm.Name,
+                        Score = 0,
+                        Id = rdm.IntId
+                    }))
+                }
             }
             
             
@@ -53,7 +63,7 @@ namespace DDRTracker.Services
 
             } catch (Exception)
             {
-                Debug.WriteLine("Something went wrong with intializing intial data in RealmDatabase.");
+                Debug.WriteLine("Something went wrong with intializing initial data in RealmDatabase.");
             };
         }
 
@@ -115,6 +125,18 @@ namespace DDRTracker.Services
                 Debug.WriteLine("Something went wrong with trying to update into the database.");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Gets all songs that match or contains letters with respect to the query string. This function is case insensitive.
+        /// </summary>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Song>> GetByName(string queryString)
+        {
+            var grabSongs = realm.All<Song>().ToList();
+            var searchableSongs = grabSongs.Where((Song s) => s.Name.ToLower().Contains(queryString.ToLower())).ToList();
+            return await Task.FromResult(searchableSongs);
         }
     }
 }
