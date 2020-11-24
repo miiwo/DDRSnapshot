@@ -9,11 +9,14 @@ namespace DDRTracker.InterfaceBases
     {
         Delegate eventHandler;
 
+        #region XAMLProperties
         public static readonly BindableProperty EventNameProperty = BindableProperty.Create("EventName", typeof(string), typeof(EventToCommandBehavior), null, propertyChanged: OnEventNameChanged);
         public static readonly BindableProperty CommandProperty = BindableProperty.Create("Command", typeof(ICommand), typeof(EventToCommandBehavior), null);
         public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create("CommandParameter", typeof(object), typeof(EventToCommandBehavior), null);
         public static readonly BindableProperty InputConverterProperty = BindableProperty.Create("Converter", typeof(IValueConverter), typeof(EventToCommandBehavior), null);
+        #endregion
 
+        #region Fields
         public string EventName
         {
             get { return (string)GetValue(EventNameProperty); }
@@ -37,6 +40,7 @@ namespace DDRTracker.InterfaceBases
             get { return (IValueConverter)GetValue(InputConverterProperty); }
             set { SetValue(InputConverterProperty, value); }
         }
+        #endregion
 
         protected override void OnAttachedTo(VisualElement bindable)
         {

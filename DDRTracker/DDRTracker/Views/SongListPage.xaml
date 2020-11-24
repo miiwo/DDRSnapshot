@@ -9,11 +9,13 @@
              x:Name="BrowseSongPage">
 
     <StackLayout>
-        <SearchBar x:Name="searchBar" Placeholder="Search songs..." TextColor="Black" SearchCommand="{Binding PerformSearchCommand}" SearchCommandParameter="{Binding Text, Source={x:Reference searchBar}">
+
+        <SearchBar x:Name="searchBar" Placeholder="Search songs..." TextColor="Black" Text="{Binding Query}" SearchCommand="{Binding PerformSearchCommand}" SearchCommandParameter="{Binding Query}">
             <SearchBar.Behaviors>
                 <behaviors:DelayedEventToCommandBehavior EventName="TextChanged" Command="{Binding PerformSearchCommand}" CommandParameter="{Binding Query}" />
             </SearchBar.Behaviors>
         </SearchBar>
+
         <RefreshView x:DataType="local:SongListViewModel" Command="{Binding LoadListCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
             <CollectionView  x:Name="SongsListView" ItemsSource="{Binding ItemList}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
@@ -31,6 +33,7 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </RefreshView>
+        
     </StackLayout>
     
 </ContentPage>

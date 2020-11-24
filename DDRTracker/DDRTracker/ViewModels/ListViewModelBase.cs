@@ -41,6 +41,15 @@ namespace DDRTracker.ViewModels
         }
         #endregion
 
+        #region Query
+        protected string _query;
+        public string Query
+        {
+            get { return _query; }
+            set { SetField(ref _query, value); }
+        }
+        #endregion
+
 
         public ListViewModelBase()
         {
