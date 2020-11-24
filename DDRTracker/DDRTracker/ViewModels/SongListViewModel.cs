@@ -66,7 +66,7 @@ namespace DDRTracker.ViewModels
             {
                 ItemList.Clear();
 
-                var songs = await ((SongRealmDataStore)DataStore).GetByName(query);
+                var songs = string.IsNullOrWhiteSpace(query) ? await DataStore.GetAllAsync(true) : await ((SongRealmDataStore)DataStore).GetByName(query);
                 foreach(var song in songs)
                 {
                     ItemList.Add(song);
@@ -74,7 +74,7 @@ namespace DDRTracker.ViewModels
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Something happened while performing a search");
+                Debug.WriteLine(string.Format("SongListViewModel: Could not PerformSearch() with query: '{0}'.", query));
                 Debug.WriteLine(e.Message);
             }
             finally {
