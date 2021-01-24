@@ -19,6 +19,7 @@ namespace DDRTracker.Services
     {
         readonly Realm realm = null;
         readonly Realms.Sync.App app = null;
+        MongoClient mongoClient;
 
         public RealmDataStore()
         {
@@ -27,25 +28,42 @@ namespace DDRTracker.Services
             realm = Realm.GetInstance(config);
 
             // Setup online database
+            updateFromOnline();
+        }
+
+        void updateFromOnline()
+        {
+            // Setup Realm Sync info
             app = Realms.Sync.App.Create(Constants.RealmAppID);
             var user = await app.LogInAsync(Credentials.Anonymous());
-            var configTwo = new SyncConfiguration("PUBLIC", user);
-            using (var realmTwo = await Realm.GetInstanceAsync(configTwo))
+
+            // Connect to database and grab data directly
+            var mongoClient = user.GetMongoClient(Constants.atlas_service);
+            var dbSong = mongoClient.GetDatabase(Constants.db_name);
+            var songList = dbSong.GetCollection<SongMetaData>(Constants.table_name).FindAsync();
+
+            // Fill into local database
+            try 
             {
-                // Grab data from online and put into local database.
-                var onlineSongs = realmTwo.All<RealmDataModel>();
-                foreach(RealmDataModel rdm in onlineSongs)
+                realm.Write(() => 
                 {
-                    tmpRealm.Add((tmpRealm) => tmpRealm.Add(new Song() 
+                    foreach (SongMetaData rdm in songList)
                     {
-                        Name = rdm.Name,
-                        Score = 0,
-                        Id = rdm.IntId
-                    }))
-                }
+                        realm.Add(new Song
+                        {
+                            Name = rdm.Name,
+                            Score = 0,
+                            OId = rdm.Id,
+                            Id = rdm.IntId
+                        });
+                    }
+                });
+                
+            } catch (Exception e)
+            {
+                Debug.WriteLine("Something went wrong with putting the songs from the cloud mongoDB into the phone's local copy. SongRealmDataStore.UpdateFromOnline");
+                Debug.WriteLine(e.ToString());
             }
-            
-            
 
         }
 
