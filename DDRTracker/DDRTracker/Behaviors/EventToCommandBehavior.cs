@@ -5,6 +5,9 @@ using Xamarin.Forms;
 
 namespace DDRTracker.InterfaceBases
 {
+    /// <summary>
+    /// Behavior class that attaches commands to certain events. Adapter pattern.
+    /// </summary>
     public class EventToCommandBehavior : BehaviorBase<VisualElement>
     {
         Delegate eventHandler;
@@ -42,18 +45,30 @@ namespace DDRTracker.InterfaceBases
         }
         #endregion
 
+        /// <summary>
+        /// Register an event to a specified behavior.
+        /// </summary>
+        /// <param name="bindable">VisualElement</param>
         protected override void OnAttachedTo(VisualElement bindable)
         {
             base.OnAttachedTo(bindable);
             RegisterEvent(EventName);
         }
 
+        /// <summary>
+        /// Deregister an event to a specified behavior.
+        /// </summary>
+        /// <param name="bindable">VisualElement</param>
         protected override void OnDetachingFrom(VisualElement bindable)
         {
             DeregisterEvent(EventName);
             base.OnDetachingFrom(bindable);
         }
 
+        /// <summary>
+        /// Registers the OnEvent method to the specified event.
+        /// </summary>
+        /// <param name="name">The name of the event</param>
         void RegisterEvent(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -72,6 +87,10 @@ namespace DDRTracker.InterfaceBases
             eventInfo.AddEventHandler(AssociatedObject, eventHandler);
         }
 
+        /// <summary>
+        /// De-registers the OnEvent method to the specified event.
+        /// </summary>
+        /// <param name="name">The name of the event</param>
         void DeregisterEvent(string name)
         {
             if (string.IsNullOrWhiteSpace(name) ||
@@ -90,6 +109,11 @@ namespace DDRTracker.InterfaceBases
             eventHandler = null;
         }
 
+        /// <summary>
+        /// Callback function. Method to call on the command. This essentially holds the code to execute the associated command.
+        /// </summary>
+        /// <param name="sender">Object that generated the Event</param>
+        /// <param name="eventArgs">Parameters to supply the command with</param>
         void OnEvent(object sender, object eventArgs)
         {
             if (Command == null)
@@ -128,6 +152,10 @@ namespace DDRTracker.InterfaceBases
             behavior.RegisterEvent(newEventName);
         }
 
+        /// <summary>
+        /// Executes the given command. For subclasses, provides flexibility in how the command is executed.
+        /// </summary>
+        /// <param name="resolvedParameter">Parameters to supply the command with</param>
         protected virtual void ExecuteBehaviorCommand(object resolvedParameter)
         {
             if (Command.CanExecute(resolvedParameter))
@@ -135,5 +163,6 @@ namespace DDRTracker.InterfaceBases
                 Command.Execute(resolvedParameter);
             }
         }
+        
     }
 }

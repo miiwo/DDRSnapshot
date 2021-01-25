@@ -7,33 +7,42 @@ using Xamarin.Forms;
 
 namespace DDRTracker.InterfaceBases
 {
-    #region Delay(ms)
-    public const int DEFAULT_DELAY_INTERVAL_MS = 500;
 
-    public int MinimumDelayIntervalMilliseconds
+    /// <summary>
+    /// Behavior subclass that delays a command from being executed.
+    /// </summary>
+    public class DelayedEventToCommandBehavior : EventToCommandBehavior
     {
-        get { return (int)GetValue(MinimumDelayIntervalMillisecondsProperty); }
-        set { SetValue(MinimumDelayIntervalMillisecondsProperty, value); }
-    }
+        #region Delay(ms)
+        public const int DEFAULT_DELAY_INTERVAL_MS = 500;
 
-    public static readonly BindableProperty MinimumDelayIntervalMillisecondsProperty = BindableProperty.Create(nameof(MinimumDelayIntervalMilliseconds), typeof(int), typeof(DelayedEventToCommandBehavior), DEFAULT_DELAY_INTERVAL_MS);
-    #endregion
-
-    CancellationTokenSource throttleCts = new CancellationTokenSource();
-
-    async protected override void ExecuteBehaviorCommand(object resolvedParameter)
-    {
-        try
+        public int MinimumDelayIntervalMilliseconds
         {
-            Interlocked.Exchange(ref throttleCts, new CancellationTokenSource()).Cancel();
-            await Task.Delay(MinimumDelayIntervalMilliseconds, throttleCts.Token).ContinueWith(delegate { Command.Execute(resolvedParameter); },
-            CancellationToken.None,
-            TaskContinuationOptions.OnlyOnRanToCompletion,
-            TaskScheduler.FromCurrentSynchronizationContext());
+            get { return (int)GetValue(MinimumDelayIntervalMillisecondsProperty); }
+            set { SetValue(MinimumDelayIntervalMillisecondsProperty, value); }
         }
-        catch (OperationCanceledException)
+
+        public static readonly BindableProperty MinimumDelayIntervalMillisecondsProperty = BindableProperty.Create(nameof(MinimumDelayIntervalMilliseconds), typeof(int), typeof(DelayedEventToCommandBehavior), DEFAULT_DELAY_INTERVAL_MS);
+        #endregion
+
+        CancellationTokenSource throttleCts = new CancellationTokenSource();
+
+        async protected override void ExecuteBehaviorCommand(object resolvedParameter)
         {
-            Debug.WriteLine("DelayedEventToCommand Error");
+            try
+            {
+                Interlocked.Exchange(ref throttleCts, new CancellationTokenSource()).Cancel();
+                await Task.Delay(MinimumDelayIntervalMilliseconds, throttleCts.Token).ContinueWith(delegate { Command.Execute(resolvedParameter); },
+                CancellationToken.None,
+                TaskContinuationOptions.OnlyOnRanToCompletion,
+                TaskScheduler.FromCurrentSynchronizationContext());
+                
+            } catch (OperationCanceledException)
+            {
+                Debug.WriteLine("DelayedEventToCommand Error");
+
+            }
         }
     }
+    
 }
