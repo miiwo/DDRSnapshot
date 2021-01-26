@@ -11,7 +11,7 @@ namespace DDRTracker.Views
         public CameraPage()
         {
             InitializeComponent();
-            BindingContext = SongCameraViewModel.Instance;
+            BindingContext = new SongCameraViewModel(AmazonPhotoProcessor.Instance);
         }
 
 

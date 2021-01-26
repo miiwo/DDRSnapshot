@@ -11,7 +11,7 @@ namespace DDRTracker.ViewModels
 {
     /// <summary>
     /// ViewModel for a Song Detail Page. Allows a user to view a song's information: Name, Score, etc. Able to change existing score data from here.
-    /// Note: Consider turning Commands into ICommands and turning them into their respective equivalents here. Mouse over the changeCanExecute to get what the event should really be called.
+    /// TODO: Change this to use ObjectID instead of SongID.
     /// </summary>
     [QueryProperty(nameof(SongId), nameof(SongId))] // Identifier/Route of this class. First Argument is the public property name from this class. Second argument is the parameter name used in the URL by the navigation.
     class SongDetailViewModel : ObservableBase
@@ -29,6 +29,7 @@ namespace DDRTracker.ViewModels
         #endregion
 
         public int Id { get; set; }
+        public ObjectId ObjID {get; set; } // ObjectID
         
         #region Name
         string _name;
@@ -89,6 +90,7 @@ namespace DDRTracker.ViewModels
             {
                 Song updatedSong = new Song()
                 {
+                    OId = ObjID,
                     Id = Id,
                     Name = Name,
                     Score = Score
@@ -121,6 +123,7 @@ namespace DDRTracker.ViewModels
             {
                 var song = await DataStore.GetAsync(songId);
 
+                ObjID = song.OId;
                 Id = song.Id;
                 Name = song.Name;
                 Score = song.Score;

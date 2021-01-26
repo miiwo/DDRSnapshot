@@ -12,11 +12,13 @@ namespace DDRTracker.ViewModels
 {
     /// <summary>
     /// ViewModel to display a list of songs from the datastore. Singleton as there should only be one instance of this class ever at runtime. Master list for a user.
-    /// Note: Check my overrides access modifiers.
+    /// Note: Put Searchbar behavior thing into viewmodel.
+    /// Note: I need to refresh in order for the songs to show up. Fix this somehow.
+    /// TODO: Along with SongDetail, have the URI be the objectID instead.
     /// </summary>
     public sealed class SongListViewModel : ListViewModelBase<Song, string>
     {
-        public static SongListViewModel Instance { get; } = new SongListViewModel();
+        public static readonly SongListViewModel Instance { get; } = new SongListViewModel(); // Singleton
 
         IDataSource<Song, string> DataStore => DependencyService.Get<IDataSource<Song, string>>();
 
@@ -39,7 +41,7 @@ namespace DDRTracker.ViewModels
             catch (Exception e)
             {
                 Debug.WriteLine("Could not load songs from data store.");
-                Debug.WriteLine(e);
+                Debug.WriteLine(e.Message);
                 await Shell.Current.DisplayAlert("SONG LIST", "Could not load songs from database.", "OK");
             }
             finally
@@ -77,7 +79,8 @@ namespace DDRTracker.ViewModels
                 Debug.WriteLine(string.Format("SongListViewModel: Could not PerformSearch() with query: '{0}'.", query));
                 Debug.WriteLine(e.Message);
             }
-            finally {
+            finally 
+            {
                 IsBusy = false;
             }
         }

@@ -6,6 +6,7 @@ namespace DDRTracker.Models
     // Consider now that in the cloud database have the stepchart, and have the song only contain pattern/bpm info.
     // ORM of the song meta data obtained from the cloud MongoDB. 
     // Consider removing the MapTo as that's for Realm Sync. Also remove Score from cloud db as its not needed.
+    // Remove the partition as well since I'm grabbing directly from the database. Have no need to split and sync.
     public class SongMetaData : RealmObject
     {
         [PrimaryKey]
@@ -25,5 +26,10 @@ namespace DDRTracker.Models
         [MapTo("score")]
         [BsonElement("score")]
         public int Score {get; set; }
+
+        [MapTo("_partition")]
+        [BsonElement("_partition")]
+        [Required]
+        public string Partition {get; set; }
     }
 }

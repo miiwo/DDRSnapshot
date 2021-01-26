@@ -12,7 +12,8 @@ namespace DDRTracker.InterfaceBases
 {
     /// <summary>
     /// This class represents what a page should do when using the Camera. It should be able to take pictures, and pick pictures from the gallery. Also supports an option to display the image selected/taken in the app.
-    /// Note: Check that the rawImage and selectedImage are working properly.
+    /// TODO: Work on saving image to gallery
+    /// TODO: Provide a CameraPreview
     /// </summary>
     public abstract class CameraViewModelBase : ObservableBase
     {
@@ -30,6 +31,8 @@ namespace DDRTracker.InterfaceBases
         public ICommand TakePictureCommand { get; }
         public ICommand GalleryCommand { get; }
         #endregion
+
+        IPhotoService PhotoHelper => DependencyService.Get<IPhotoService>();
 
         public CameraViewModelBase()
         {
@@ -108,6 +111,15 @@ namespace DDRTracker.InterfaceBases
 
             }
 
+        }
+
+        /// <summary>
+        /// Save the photo obtained from this to the user's gallery.
+        /// </summary>
+        protected async void SavePhoto()
+        {
+            // Might require me to dig into Android + iOS specific implementations
+            PhotoHelper.SavePhoto(rawImage);
         }
     }
 }

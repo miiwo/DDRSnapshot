@@ -13,16 +13,13 @@ namespace DDRTracker.ViewModels
 {
     /// <summary>
     /// ViewModel for a Camera Page in the DDR Tracking Application. Has the ability to take a picture, pick a picture from gallery, 
-    /// and process picture data into data that is storeable by the data store. Singleton class. Don't add it to the abstract class.
-    /// TODO: Check all of my awaits. If I need them or not.
-    /// TODO: Check that my streams are being disposed of properly at the end when they are not in use.
-    /// TODO: Remember to cleanup tupleList name and construction. And also learn to write regex better.
-    /// TODO: Save file when can't process photo.
+    /// and process picture data into data that is storeable by the data store.
+    /// TODO: Learn to write regex better.
+    /// TODO: Make the tuple into its own class.
+    /// TODO: Make the data store a DI.
     /// </summary>
     public sealed class SongCameraViewModel : CameraViewModelBase
     {
-        public static SongCameraViewModel Instance { get; } = new SongCameraViewModel(); // Singleton
-
         readonly IPhotoProcessor photoAnalyzer;
 
         public ICommand ProcessCommand { get; }
@@ -30,7 +27,7 @@ namespace DDRTracker.ViewModels
         readonly (string Key, Regex Rgx, bool AlreadyFound)[] detectFromPhotos;
 
         IDataSource<Song, string> DataStore => DependencyService.Get<IDataSource<Song, string>>();
-
+        
         #region IsBusy
         bool _isBusy = false;
         public bool IsBusy
@@ -40,13 +37,13 @@ namespace DDRTracker.ViewModels
         }
         #endregion
 
-        private SongCameraViewModel()
+        public SongCameraViewModel(IPhotoProcessor ipp)
         {
             ProcessCommand = new Command(ProcessPictureInfo);
 
-            photoAnalyzer = new AmazonPhotoProcesssor();
+            photoAnalyzer = ipp;
 
-            detectFromPhotos = new (string Key, Regex Rgx, bool AlreadyFound)[]
+            detectFromPhotos = new (string Key, Regex Rgx, bool AlreadyFound)[] // Put this into the View
             {
                 ("NAME", new Regex(@"^[\d\.]+\b(.+)"), false), // Learn to make better regexes me ;-;
                 ("SCORE", new Regex(@"^MARVELOUS (\d+)"), false)
@@ -54,7 +51,7 @@ namespace DDRTracker.ViewModels
         }
  
         /// <summary>
-        /// Using the image that the user has selected, attempt to analyze the photo and have it store into the database.
+        /// Using the image that the user has selected, attempt to analyze the photo and have it stored into the database.
         /// </summary>
         async void ProcessPictureInfo()
         {
@@ -63,6 +60,12 @@ namespace DDRTracker.ViewModels
                 await Shell.Current.DisplayAlert("NO PICTURE", "No picture to process into a song.", "OK");
                 return;
             }
+
+            if (photoAnalyzer == null)
+            {
+                throw Exception("Did not set an analyzer with which to analyze with.");
+            }
+
 
             photoAnalyzer.ClearData();
             var resultMap = await photoAnalyzer.ProcessPictureInfoAsync(rawImage, detectFromPhotos);
@@ -81,15 +84,15 @@ namespace DDRTracker.ViewModels
                 await Shell.Current.DisplayAlert("FAILURE", "Could not add the song to the database.\nPlease either retake the photo or manually input.", "OK");
 
                 // Save file to gallery
-                // Might require me to dig into android and ios specific things.
+                SavePhoto();
             }
         }
 
         /// <summary>
         /// Converts a dictionary into a Song model object. Helper function to parse the photo processor.
         /// </summary>
-        /// <param name="dict"></param>
-        /// <returns></returns>
+        /// <param name="dict">Where to get the data from</param>
+        /// <returns>Data obtained from photo in a Song object or null if it could not be converted.</returns>
         Song ConvertToSong(IDictionary<string, string> dict)
         {
 
@@ -113,8 +116,7 @@ namespace DDRTracker.ViewModels
             }
 
             return null;
-
         }
-        
+
     }
 }

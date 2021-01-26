@@ -16,12 +16,16 @@ namespace DDRTracker.Services
 {
     /// <summary>
     /// Proccesses information from a photo into key-value pairs using Amazon's Rekognition system. Decoupled to be used for any photo analyzation.
-    /// Note: Change my regexes to be better and change the match group.
-    /// Note: Consider making this a singleton because I only want one instance connecting at a time.
+    /// Note: Consider making this a singleton because I only want one instance connecting at a time. Also because I have limited access to how many times I can scan. If I didn't have a limit, remove Singleton.
+    // But still make it lazy because we won't ever really need to use it unless used.
     /// Note: Rewrite code for the tuple list (specifically the readonly problem)
+    /// Note: Consider making the tuple into its own class.
+    /// Note: Along with whatever is implementing this class. Change how it matches (match groups)
     /// </summary>
-    public class AmazonPhotoProcesssor : IPhotoProcessor
+    public sealed class AmazonPhotoProcesssor : IPhotoProcessor
     {
+        public static readonly Lazy<AmazonPhotoProcessor> Instance { get; } = new Lazy<AmazonPhotoProcessor>(() => new AmazonPhotoProcessor());
+
         readonly AmazonRekognitionClient arClient;
         public IDictionary<string, string> HashMap { get; }
 
@@ -30,11 +34,11 @@ namespace DDRTracker.Services
         /// <summary>
         /// Constructor for AmazonPhotoProcessor. Intializes values to be setup when using this class.
         /// </summary>
-        public AmazonPhotoProcesssor()
+        private AmazonPhotoProcesssor()
         {
             // Initialize the Amazon Cognito credentials provider
             CognitoAWSCredentials credentials = new CognitoAWSCredentials(
-                Constants.AmazonCredentials, // Identity pool ID
+                Constants.AmazonCredentials, // Identity pool ID, stored in a separate class :X
                 RegionEndpoint.USEast2 // Region
             );
 
@@ -47,7 +51,13 @@ namespace DDRTracker.Services
 
         /// <summary>
         /// Reads a picture and returns the data obtained from it into a dictionary with key-value pairs.
+        /// For this specifically, items in a picture are connected (ie. fruit : apple), except its for
+        /// (judgement, values) in the game. This will return the appropriate pairing. Until I rework this
+        /// to be able to grab both the judgement and its value into one var.
         /// </summary>
+        /// <param name="photo">photo file to be analyzed</param>
+        /// <param name="tupleList">list containing what to search for in the image</param>
+        /// <returns></returns>
         public async Task<IDictionary<string, string>> ProcessPictureInfoAsync(FileResult photo, IEnumerable<(string Key, Regex Rgx, bool AlreadyFound)> tupleList)
         {
             try
@@ -114,10 +124,11 @@ namespace DDRTracker.Services
         }
 
         /// <summary>
-        /// Checks if the fields that need to be filled in as given by the user matches with what the processor grabs. This is a pre-optimization to ensuring that all fields are filled in. Consider removing it.
+        /// Checks if the fields that need to be filled in as given by the user matches with what the processor grabs. 
+        /// This is a pre-optimization to ensuring that all fields are filled in. Consider removing it.
         /// </summary>
         /// <param name="targetFields">user provides the key fields that need to be filled</param>
-        /// <returns></returns>
+        /// <returns>boolean indicating if all fields have values in them</returns>
         public bool ValidateAllInfo(string[] targetFields)
         {
             foreach(string s in targetFields)
