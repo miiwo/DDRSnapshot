@@ -6,31 +6,55 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace DDRTracker.ViewModels
 {
     /// <summary>
-    /// ViewModel to display a list of songs from the datastore. Singleton as there should only be one instance of this class ever at runtime. Master list for a user.
-    /// Note: Put Searchbar behavior thing into viewmodel.
-    /// Note: I need to refresh in order for the songs to show up. Fix this somehow.
+    /// ViewModel to display a list of songs from the datastore. Master list for a user.
     /// TODO: Along with SongDetail, have the URI be the objectID instead.
+    /// TODO: Make the DataStore a DI.
     /// </summary>
     public sealed class SongListViewModel : ListViewModelBase<Song, string>
     {
-        public static readonly SongListViewModel Instance { get; } = new SongListViewModel(); // Singleton
+        bool shouldUpdateFromCloud = false;
 
         IDataSource<Song, string> DataStore => DependencyService.Get<IDataSource<Song, string>>();
 
-        private SongListViewModel() {}
+        public SongListViewModel() 
+        {
+            if (Connectivity.NetworkAccess == NetworkAccess.Internet)
+            {
+                shouldUpdateFromCloud = true;
+            }
+        }
 
-        public override async Task ExecuteLoadItemsCommand()
+        public override async Task LoadItems()
         {
             IsBusy = true;
 
             try
             {
                 ItemList.Clear();
+
+
+                if (shouldUpdateFromCloud)
+                {
+                    try
+                    {
+                        await ((SongRealmDataStore)DataStore).UpdateFromOnline();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine("Error in grabbing songs from the network");
+                    }
+                    finally
+                    {
+                        shouldUpdateFromCloud = false;
+                    }
+                }
+
 
                 var songs = await DataStore.GetAllAsync(true);
                 foreach (var song in songs)
@@ -42,6 +66,7 @@ namespace DDRTracker.ViewModels
             {
                 Debug.WriteLine("Could not load songs from data store.");
                 Debug.WriteLine(e.Message);
+
                 await Shell.Current.DisplayAlert("SONG LIST", "Could not load songs from database.", "OK");
             }
             finally
@@ -68,8 +93,8 @@ namespace DDRTracker.ViewModels
             {
                 ItemList.Clear();
 
-                var songs = string.IsNullOrWhiteSpace(query) ? await DataStore.GetAllAsync(true) : await ((SongRealmDataStore)DataStore).GetByName(query);
-                foreach(var song in songs)
+                var filteredsongs = string.IsNullOrWhiteSpace(query) ? await DataStore.GetAllAsync(true) : await ((SongRealmDataStore)DataStore).GetByName(query);
+                foreach(var song in filteredsongs)
                 {
                     ItemList.Add(song);
                 }

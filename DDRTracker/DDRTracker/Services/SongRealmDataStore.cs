@@ -14,8 +14,6 @@ namespace DDRTracker.Services
     /// <summary>
     /// Concrete class that implements a data store using MongoDB as a cloud database. Currently stores it in mobile device using a Realm database.
     /// Note: Have this class throw exceptions.
-    /// Consider surrounding some code with try catch statements. Or using statements.
-    /// Note: When checking online, check last updated field first before grabbing everything else, like sending a messenger.
     /// </summary>
     class RealmDataStore : IDataSource<Song, string>
     {
@@ -29,15 +27,14 @@ namespace DDRTracker.Services
             realm = Realm.GetInstance(config);
 
             // Test local dummy data
-            IntializeSongs();
-            // Setup online database
-            updateFromOnline();
+            InitializeSongs();
+            // Setup online config
+            app = Realms.Sync.App.Create(Constants.RealmAppID);
         }
 
-        void updateFromOnline()
+        public void updateFromOnline()
         {
-            // Setup Realm Sync info
-            app = Realms.Sync.App.Create(Constants.RealmAppID);
+            
             var user = await app.LogInAsync(Credentials.Anonymous());
 
             // Connect to database and grab data directly
@@ -50,14 +47,14 @@ namespace DDRTracker.Services
             {
                 realm.Write(() => 
                 {
-                    foreach (SongMetaData rdm in songList)
+                    foreach (SongMetaData smd in songList)
                     {
                         realm.Add(new Song
                         {
-                            Name = rdm.Name,
+                            Name = smd.Name,
                             Score = 0,
-                            OId = rdm.Id,
-                            Id = rdm.IntId
+                            OId = smd.Id,
+                            Id = smd.IntId
                         });
                     }
                 });
@@ -65,7 +62,7 @@ namespace DDRTracker.Services
             } 
             catch (Exception e)
             {
-                Debug.WriteLine("Something went wrong with putting the songs from the cloud mongoDB into the phone's local copy. SongRealmDataStore.UpdateFromOnline");
+                Debug.WriteLine("Something went wrong with putting the songs from the cloud mongoDB into the phone's DB. SongRealmDataStore.UpdateFromOnline");
                 Debug.WriteLine(e.ToString());
             } 
             finally
@@ -79,22 +76,22 @@ namespace DDRTracker.Services
         /// <summary>
         /// Helper method to help me populate the song list at first.
         /// </summary>
-        void IntializeSongs()
+        void InitializeSongs()
         {
             try
             {
                 realm.Write(() =>
                 {
-                    realm.Add(new Song { OId = ObjectID.Create(), Id = 1, Name = "Sakura Storm", Score = 230 });
-                    realm.Add(new Song { OId = ObjectID.Create(), Id = 2, Name = "ACES FOR ACES", Score = 1000 });
-                    realm.Add(new Song { OId = ObjectID.Create(), Id = 3, Name = "Be a Hero!", Score = 0 });
-                    realm.Add(new Song { OId = ObjectID.Create(), Id = 4, Name = "Emera", Score = 530 });
+                    realm.Add(new Song { OId = ObjectID.GenerateNewId(), Id = 1, Name = "Sakura Storm", Score = 230 });
+                    realm.Add(new Song { OId = ObjectID.GenerateNewId(), Id = 2, Name = "ACES FOR ACES", Score = 1000 });
+                    realm.Add(new Song { OId = ObjectID.GenerateNewId(), Id = 3, Name = "Be a Hero!", Score = 0 });
+                    realm.Add(new Song { OId = ObjectID.GenerateNewId(), Id = 4, Name = "Emera", Score = 530 });
                 });
 
             } 
             catch (Exception)
             {
-                Debug.WriteLine("Something went wrong with intializing initial data in RealmDatabase.");
+                Debug.WriteLine("Something went wrong with initializing initial data in RealmDatabase.");
             };
         }
 
@@ -103,12 +100,13 @@ namespace DDRTracker.Services
             try
             {
                 await realm.WriteAsync((tmpRealm) => tmpRealm.Add(item));
-                return true;
 
+                return true;
             } 
             catch (Exception)
             {
                 Debug.WriteLine("Something went wrong with trying to add into the database.");
+
                 return false;
             }
             
@@ -125,6 +123,7 @@ namespace DDRTracker.Services
             {
                 Debug.WriteLine("Something went wrong with getting all the songs from the datastore. SONGREALMDATASTORE.cs");
                 Debug.WriteLine(e.Message);
+
                 return Enumerable.Empty<Song>();
             }
 
@@ -145,12 +144,13 @@ namespace DDRTracker.Services
                     var song = realm.All<Song>().Where(s => s.Id == int.Parse(id)).First();
                     tmpRealm.Remove(song);
                 });
+
                 return true;
-                
             } 
             catch (Exception)
             {
                 Debug.WriteLine("Something went wrong with trying to remove from the database.");
+
                 return false;
             }
         }
@@ -160,12 +160,13 @@ namespace DDRTracker.Services
             try
             {
                 await realm.WriteAsync((tmpRealm) => tmpRealm.Add(item, true));
-                return true;
 
+                return true;
             }
             catch (Exception)
             {
                 Debug.WriteLine("Something went wrong with trying to update into the database.");
+
                 return false;
             }
         }
@@ -179,6 +180,7 @@ namespace DDRTracker.Services
         {
             var grabSongs = realm.All<Song>().ToList();
             var searchableSongs = grabSongs.Where((Song s) => s.Name.ToLower().Contains(queryString.ToLower())).ToList();
+            
             return await Task.FromResult(searchableSongs);
         }
     }
