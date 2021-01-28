@@ -1,4 +1,5 @@
 ﻿using DDRTracker.Helpers;
+using DDRTracker.Services;
 
 using System;
 using System.Diagnostics;
@@ -11,9 +12,9 @@ using Xamarin.Forms;
 namespace DDRTracker.InterfaceBases
 {
     /// <summary>
-    /// This class represents what a page should do when using the Camera. It should be able to take pictures, and pick pictures from the gallery. Also supports an option to display the image selected/taken in the app.
-    /// TODO: Work on saving image to gallery
-    /// TODO: Provide a CameraPreview
+    /// This class represents what a page should do when using the Camera. It should be able to take pictures, and pick pictures from the gallery. 
+    /// Also supports an option to display the image selected/taken in the app.
+    /// TODO: Work on saving images to gallery
     /// </summary>
     public abstract class CameraViewModelBase : ObservableBase
     {
@@ -32,7 +33,7 @@ namespace DDRTracker.InterfaceBases
         public ICommand GalleryCommand { get; }
         #endregion
 
-        IPhotoService PhotoHelper => DependencyService.Get<IPhotoService>();
+        IPhotoService PhotoAssistant => DependencyService.Get<IPhotoService>(); // Personal class that saves to platform-specific mobile devices storage.
 
         public CameraViewModelBase()
         {
@@ -118,8 +119,7 @@ namespace DDRTracker.InterfaceBases
         /// </summary>
         protected async void SavePhoto()
         {
-            // Might require me to dig into Android + iOS specific implementations
-            PhotoHelper.SavePhoto(rawImage);
+            PhotoAssistant.SavePhoto(rawImage);
         }
     }
 }

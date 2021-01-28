@@ -1,7 +1,9 @@
 ﻿using DDRTracker.InterfaceBases;
 using DDRTracker.Models;
+using DDRTracker.PhotoProcessors;
 using DDRTracker.Services;
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -15,7 +17,6 @@ namespace DDRTracker.ViewModels
     /// ViewModel for a Camera Page in the DDR Tracking Application. Has the ability to take a picture, pick a picture from gallery, 
     /// and process picture data into data that is storeable by the data store.
     /// TODO: Learn to write regex better.
-    /// TODO: Make the tuple into its own class.
     /// TODO: Make the data store a DI.
     /// </summary>
     public sealed class SongCameraViewModel : CameraViewModelBase
@@ -24,7 +25,7 @@ namespace DDRTracker.ViewModels
 
         public ICommand ProcessCommand { get; }
 
-        readonly (string Key, Regex Rgx, bool AlreadyFound)[] detectFromPhotos;
+        readonly ProcessorOptions[] detectFromPhotos;
 
         IDataSource<Song, string> DataStore => DependencyService.Get<IDataSource<Song, string>>();
         
@@ -43,10 +44,10 @@ namespace DDRTracker.ViewModels
 
             photoAnalyzer = ipp;
 
-            detectFromPhotos = new (string Key, Regex Rgx, bool AlreadyFound)[] // Put this into the View
+            detectFromPhotos = new ProcessorOptions[] // Put this into the View
             {
-                ("NAME", new Regex(@"^[\d\.]+\b(.+)"), false), // Learn to make better regexes me ;-;
-                ("SCORE", new Regex(@"^MARVELOUS (\d+)"), false)
+                new ProcessorOptions("NAME", new Regex(@"^[\d\.]+\b(.+)"), false), // Learn to make better regexes me ;-;
+                new ProcessorOptions("SCORE", new Regex(@"^MARVELOUS (\d+)"), false)
             };
         }
  
@@ -63,7 +64,7 @@ namespace DDRTracker.ViewModels
 
             if (photoAnalyzer == null)
             {
-                throw Exception("Did not set an analyzer with which to analyze with.");
+                throw new Exception("Did not set an analyzer with which to analyze with.");
             }
 
 

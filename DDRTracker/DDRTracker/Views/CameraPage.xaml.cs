@@ -1,4 +1,6 @@
-﻿using DDRTracker.ViewModels;
+﻿using DDRTracker.Services;
+using DDRTracker.ViewModels;
+
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -11,7 +13,7 @@ namespace DDRTracker.Views
         public CameraPage()
         {
             InitializeComponent();
-            BindingContext = new SongCameraViewModel(AmazonPhotoProcessor.Instance);
+            BindingContext = new SongCameraViewModel(new AmazonPhotoProcesssor());
         }
 
 

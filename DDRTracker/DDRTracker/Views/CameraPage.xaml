@@ -2,10 +2,13 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DDRTracker.Views.CameraPage"
-             Title="{Binding Title}">
+             xmlns:views="clr-namespace:DDRTracker.Views"
+             Title="Camera">
     <StackLayout Spacing="20" Padding="15">
 
-        <Label Text="Grab a picture from your gallery!" FontSize="Medium" TextColor="Black" />
+        <Label Text="Grab a picture from your gallery!" FontSize="Medium" TextColor="Black" HorizontalOptions="FillAndExpand" />
+
+        <views:CameraPreview Camera="Rear" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
 
         <StackLayout Orientation="Horizontal">
             <Button Text="Pick Picture" Command="{Binding GalleryCommand}" HorizontalOptions="FillAndExpand" />
@@ -13,10 +16,5 @@
         </StackLayout>
 
         <Button Text="Process Picture" Command="{Binding ProcessCommand}" HorizontalOptions="FillAndExpand" />
-
-        <Image Source="{Binding ResultImage}" Aspect="AspectFit"></Image>
-
-        
-
     </StackLayout>
 </ContentPage>
