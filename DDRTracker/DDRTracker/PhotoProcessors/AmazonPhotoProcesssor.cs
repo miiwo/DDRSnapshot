@@ -3,6 +3,8 @@ using Amazon.CognitoIdentity;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
 
+using DDRTracker.PhotoProcessors;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,15 +19,14 @@ namespace DDRTracker.Services
     /// <summary>
     /// Proccesses information from a photo into key-value pairs using Amazon's Rekognition system. Decoupled to be used for any photo analyzation.
     /// Note: Consider making this a singleton because I only want one instance connecting at a time. Also because I have limited access to how many times I can scan. If I didn't have a limit, remove Singleton.
-    // But still make it lazy because we won't ever really need to use it unless used.
+    /// But still make it lazy because we won't ever really need to use it unless used.
     /// Note: Rewrite code for the tuple list (specifically the readonly problem)
-    /// Note: Consider making the tuple into its own class.
     /// Note: Along with whatever is implementing this class. Change how it matches (match groups)
+    /// TODO: Consider removing the HashMap for statelessness
+    /// TODO: Write code for multi-threading
     /// </summary>
     public sealed class AmazonPhotoProcesssor : IPhotoProcessor
     {
-        public static readonly Lazy<AmazonPhotoProcessor> Instance { get; } = new Lazy<AmazonPhotoProcessor>(() => new AmazonPhotoProcessor());
-
         readonly AmazonRekognitionClient arClient;
         public IDictionary<string, string> HashMap { get; }
 
@@ -57,8 +58,8 @@ namespace DDRTracker.Services
         /// </summary>
         /// <param name="photo">photo file to be analyzed</param>
         /// <param name="tupleList">list containing what to search for in the image</param>
-        /// <returns></returns>
-        public async Task<IDictionary<string, string>> ProcessPictureInfoAsync(FileResult photo, IEnumerable<(string Key, Regex Rgx, bool AlreadyFound)> tupleList)
+        /// <returns>A dictionary containing values sought out by the keys in ProcessorOptions</returns>
+        public async Task<IDictionary<string, string>> ProcessPictureInfoAsync(FileResult photo, IEnumerable<ProcessorOptions> tupleList)
         {
             try
             {
@@ -86,23 +87,23 @@ namespace DDRTracker.Services
                     }
 
                     // REGEX MATCHING TIME (Consider having 2 lists: not found and already found regexes, so it doesn't repeat over)
-                    using(var iteratorTuple = tupleList.GetEnumerator()) // Using statement simplfies variables that need to be disposed of at the end.
+                    using(var iteratorTuple = tupleList.GetEnumerator())
                     {
                         while (iteratorTuple.MoveNext())
                         {
-                            (string Key, Regex Rgx, bool AlreadyFound) = iteratorTuple.Current;
+                            ProcessorOptions curr = iteratorTuple.Current;
 
-                            // Fix this so I can iterate through while editing the AlreadyFound part of the tuple T-T
+                            // Fix this so I can iterate through while editing the Found part of ProcessorOptions T-T
 
-                            Match match = Rgx.Match(text.DetectedText);
+                            Match match = curr.Rgx.Match(text.DetectedText);
 
                             if (match.Success)
                             {
-                                if (!HashMap.ContainsKey(Key)) 
+                                if (!HashMap.ContainsKey(curr.Key)) 
                                 {
-                                    HashMap.Add(Key, match.Groups[1].Value);
-                                    Debug.WriteLine($"{Key} IS NOW SET TO: {HashMap[Key]}"); // Debug Statement
-                                    AlreadyFound = true; // This does not work because this enumerator is read-only
+                                    HashMap.Add(curr.Key, match.Groups[1].Value);
+                                    Debug.WriteLine($"{curr.Key} IS NOW SET TO: {HashMap[curr.Key]}"); // Debug Statement
+                                    curr.Found = true; // This does not work because this enumerator is read-only
                                 }
                                 
                                 break;
@@ -121,25 +122,6 @@ namespace DDRTracker.Services
             }
 
             return HashMap; // return this as a read only dictionary
-        }
-
-        /// <summary>
-        /// Checks if the fields that need to be filled in as given by the user matches with what the processor grabs. 
-        /// This is a pre-optimization to ensuring that all fields are filled in. Consider removing it.
-        /// </summary>
-        /// <param name="targetFields">user provides the key fields that need to be filled</param>
-        /// <returns>boolean indicating if all fields have values in them</returns>
-        public bool ValidateAllInfo(string[] targetFields)
-        {
-            foreach(string s in targetFields)
-            {
-                if (!HashMap.ContainsKey(s))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         public void ClearData()

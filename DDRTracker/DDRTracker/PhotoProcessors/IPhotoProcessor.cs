@@ -16,7 +16,7 @@ namespace DDRTracker.Services
         /// <summary>
         /// Method used to parse data and obtain certain info (as dictated by regexes) to search for.
         /// </summary>
-        Task<IDictionary<string, string>> ProcessPictureInfoAsync(FileResult photo, IEnumerable<(string Key, Regex Rgx, bool AlreadyFound)> tupleList);
+        Task<IDictionary<string, string>> ProcessPictureInfoAsync(FileResult photo, IEnumerable<ProcessorOptions> tupleList);
         
         /// <summary>
         /// Method used to clear the data the photo processor obtained.
